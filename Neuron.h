@@ -1,9 +1,7 @@
 #ifndef NEURON_H
 #define NEURON_H
 
-#include "./Includes.h"
-
-typedef double NUM;
+#include "./Include.h"
 
 #define abs(x) ((x > 0) ? x : -x)
 #define sigmoid(x) (x/(1.0 + abs(x)))

@@ -2,7 +2,7 @@
 #define NETWORK_H
 
 #include "./Neuron.h"
-#include "./Includes.h"
+#include "./Include.h"
 
 template
 <
@@ -94,7 +94,7 @@ public: // Variables
   std::array<Neuron<input_size>,  layer1_size> layer1;
   std::array<Neuron<layer1_size>, layer2_size> layer2;
   std::array<Neuron<layer2_size>, output_size> output;
-  
+
 private: // Methods
   void optimizeWeight
   (
