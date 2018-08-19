@@ -14,28 +14,57 @@ template
 class Network
 {
 public: // Methods
-  NUM calculateCost(const NUM input_layer[], const NUM output_layer[])
+  std::array<NUM, output_size> getOutput(const std::array<NUM, output_size> input)
   {
     for(std::size_t i = 0; i < layer1_size; i++)
-    { layer1[i].setValueFloat(input_layer); }
+    { layer1[i].setValueFloat(input); }
 
     for(std::size_t i = 0; i < layer2_size; i++)
     { layer2[i].setValue(layer1); }
 
+    std::array<NUM, output_size> out;
     for(std::size_t i = 0; i < output_size; i++)
-    { output[i].setValue(layer2); }
+    { out[i] = output[i].setValue(layer2); }
+
+    return out;
+  }
+
+  NUM calculateCost
+  (
+    const std::vector<std::array<NUM, input_size>> input_layer,
+    const std::vector<std::array<NUM, output_size>> output_layer
+  )
+  {
+    if(input_layer.size() > output_layer.size()){ return 0; }
 
     NUM cost = 0;
-    for(std::size_t i = 0; i < output_size; i++)
+    for(std::size_t test = 0; test < input_layer.size(); test++)
     {
-      NUM diff = output[i].value - output_layer[i];
-      cost += diff*diff;
+      for(std::size_t i = 0; i < layer1_size; i++)
+      { layer1[i].setValueFloat(input_layer[test]); }
+
+      for(std::size_t i = 0; i < layer2_size; i++)
+      { layer2[i].setValue(layer1); }
+
+      for(std::size_t i = 0; i < output_size; i++)
+      { output[i].setValue(layer2); }
+
+      for(std::size_t i = 0; i < output_size; i++)
+      {
+        NUM diff = output[i].value - output_layer[test][i];
+        cost += diff*diff;
+      }
     }
 
     return cost;
   }
 
-  NUM train(const NUM input_layer[], const NUM output_layer[], const NUM step_size)
+  NUM train
+  (
+    const std::vector<std::array<NUM, input_size>> input_layer,
+    const std::vector<std::array<NUM, output_size>> output_layer,
+    const NUM step_size = 0.001
+  )
   {
     for(std::size_t i = 0; i < layer1_size; i++)
     {
@@ -62,12 +91,17 @@ public: // Methods
   }
 
 public: // Variables
-  Neuron<input_size>  layer1[layer1_size];
-  Neuron<layer1_size> layer2[layer2_size];
-  Neuron<layer2_size> output[output_size];
-
+  std::array<Neuron<input_size>,  layer1_size> layer1;
+  std::array<Neuron<layer1_size>, layer2_size> layer2;
+  std::array<Neuron<layer2_size>, output_size> output;
+  
 private: // Methods
-  void optimizeWeight(const NUM input_layer[], const NUM output_layer[], NUM& weight, NUM step_size)
+  void optimizeWeight
+  (
+    const std::vector<std::array<NUM, input_size>> input_layer,
+    const std::vector<std::array<NUM, output_size>> output_layer,
+    NUM& weight, const NUM step_size
+  )
   {
     const NUM startCost = calculateCost(input_layer, output_layer);
     weight += step_size;
@@ -85,9 +119,6 @@ private: // Methods
       { weight += step_size*2; }
     }
   }
-
-private: // Variables
-
 };
 
 #endif
